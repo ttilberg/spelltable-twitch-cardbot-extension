@@ -1,0 +1,14 @@
+ {
+    "name": "Scryfall Image Sniffer",
+    "version": "1.0",
+    "description": "Makes things happen when you make a request for a Scryfall card image. Used to integrate a chatbot on Spelltable.",
+    "manifest_version": 2,
+    "background": {
+      "page": "chatbot.html"
+    },
+    "permissions": [
+      "webRequest",
+      "*://*.scryfall.com/",
+      "*://*.spelltable.com/"
+    ]
+  }
