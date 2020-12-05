@@ -27,6 +27,8 @@ const client = new tmi.Client({
 });
 client.connect().catch(console.error);
 
+let waitlist = new Set();
+
 chrome.webRequest.onCompleted.addListener(
   (details) => {
     const { url } = details
@@ -39,15 +41,23 @@ chrome.webRequest.onCompleted.addListener(
 
     console.log(card_id);
 
-    fetch(`https://api.scryfall.com/cards/${card_id}`)
-      .then(response => response.json())
-      .then(data => {
-        let url = data.related_uris.gatherer;
-        let name = data.name;
-        const msg = `reviewed [${name}](${url})`;
-        console.log(msg);
-        client.action(CHANNEL, msg);
-      });
+    if(!waitlist.has(card_id)) {
+      waitlist.add(card_id);
+      setTimeout(() => {waitlist.delete(card_id)}, 5000);
+
+      console.log(`querying scryfall for ${card_id}`)
+      fetch(`https://api.scryfall.com/cards/${card_id}`)
+        .then(response => response.json())
+        .then(data => {
+          let url = data.related_uris.gatherer;
+          let name = data.name;
+          const msg = `reviewed [${name}](${url})`;
+          console.log(msg);
+          client.action(CHANNEL, msg);
+        });
+    }
+
+
   }, {
     urls: [
       'https://*.scryfall.com/*'
